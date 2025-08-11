@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "book_ratings",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "user_id"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"bookId", "userId"})
 )
 @EntityListeners(AuditingEntityListener.class)
 @Getter
@@ -26,20 +26,19 @@ public class BookRating {
     private Long id;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "bookId")
     private Book book;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "useeId")
     private User user;
 
     private int rating;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

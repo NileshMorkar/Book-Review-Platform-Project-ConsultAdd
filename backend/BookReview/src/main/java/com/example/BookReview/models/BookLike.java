@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "book_likes",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "user_id"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"bookId", "userId"})
 )
 public class BookLike {
     @Id
@@ -20,11 +20,11 @@ public class BookLike {
 
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "bookId")
     private Book book;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
 

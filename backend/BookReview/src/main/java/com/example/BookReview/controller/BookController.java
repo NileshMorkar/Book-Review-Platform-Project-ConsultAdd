@@ -1,13 +1,19 @@
 package com.example.BookReview.controller;
 
+import com.example.BookReview.dto.request.BookCommentRequest;
 import com.example.BookReview.dto.request.BookRequest;
+import com.example.BookReview.dto.response.ApiResponse;
+import com.example.BookReview.dto.response.BookCommentResponse;
 import com.example.BookReview.dto.response.BookResponse;
 import com.example.BookReview.dto.response.PageableResponse;
 import com.example.BookReview.exception.GlobalException;
 import com.example.BookReview.service.BookService;
+import com.example.BookReview.service.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +26,7 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookRequest bookRequest) throws GlobalException {
-        return ResponseEntity.ok(bookService.createBook(bookRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(bookRequest));
     }
 
     @GetMapping("/{id}")
@@ -59,11 +65,45 @@ public class BookController {
     }
 
 
-//    @PostMapping("/comments")
-//    public ResponseEntity<ApiResponse> createCommentOnBook(@Valid @RequestBody BookCommentRequest bookCommentRequest){
-//
-////        ResponseEntity.Ok
-//
-//    }
+    @PostMapping("/comments")
+    public ResponseEntity<ApiResponse> createComment(@Valid @RequestBody BookCommentRequest bookCommentRequest, @AuthenticationPrincipal CustomUserDetails userDetails) throws GlobalException {
 
+        long userId = userDetails.getId();
+        bookService.createComment(userId, bookCommentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.builder()
+                        .msg("Comment Is Created Successfully!")
+                        .httpStatus(HttpStatus.CREATED)
+                        .build()
+        );
+    }
+
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<ApiResponse> updateComment(@PathVariable int commentId, @Valid @RequestBody BookCommentRequest bookCommentRequest, @AuthenticationPrincipal CustomUserDetails userDetails) throws GlobalException {
+
+        long userId = userDetails.getId();
+        bookService.updateComment(userId, commentId, bookCommentRequest);
+        
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .msg("Comment Is Updated Successfully!")
+                        .httpStatus(HttpStatus.OK)
+                        .build()
+        );
+    }
+
+
+    @GetMapping("/comments/{bookId}")
+    public ResponseEntity<PageableResponse<BookCommentResponse>> getAllComments(
+            @PathVariable int bookId,
+            @RequestParam(name = "pageNum", defaultValue = "1", required = false) int pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = "20", required = false) int pageSize,
+            @RequestParam(name = "sortBy", defaultValue = "createdAt", required = false) String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = "desc", required = false) String sortDir
+    ) throws GlobalException {
+        pageNumber--;
+        return ResponseEntity.ok(
+                bookService.getAllComments(bookId, pageNumber, pageSize, sortBy, sortDir)
+        );
+    }
 }

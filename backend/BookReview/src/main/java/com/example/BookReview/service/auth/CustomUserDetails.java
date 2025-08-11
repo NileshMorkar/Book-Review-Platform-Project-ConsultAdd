@@ -1,18 +1,22 @@
 package com.example.BookReview.service.auth;
 
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+@Data
 public class CustomUserDetails implements UserDetails {
 
-    private final String username;
+    private final long id;
+    private final String email;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.username = username;
+    public CustomUserDetails(long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.email = username;
         this.password = password;
         this.authorities = authorities;
     }
@@ -24,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

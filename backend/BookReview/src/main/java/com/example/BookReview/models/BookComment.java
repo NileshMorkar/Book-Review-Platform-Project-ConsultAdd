@@ -27,15 +27,15 @@ public class BookComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String msg;
+    private String commentMsg;
 
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "bookId")
     private Book book;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
 

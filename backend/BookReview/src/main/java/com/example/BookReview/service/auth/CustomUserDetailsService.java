@@ -26,12 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Admin admin = adminRepository.findByEmail(username).orElse(null);
         if (admin != null) {
-            return new CustomUserDetails(admin.getEmail(), admin.getPassword(), AuthorityUtils.createAuthorityList(Role.ROLE_ADMIN.name()));
+            return new CustomUserDetails(admin.getId(), admin.getEmail(), admin.getPassword(), AuthorityUtils.createAuthorityList(Role.ROLE_ADMIN.name()));
         }
 
         User user = userRepository.findByEmail(username).orElse(null);
         if (user != null) {
-            return new CustomUserDetails(user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList(Role.ROLE_USER.name()));
+            return new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), AuthorityUtils.createAuthorityList(Role.ROLE_USER.name()));
         }
 
         throw new UsernameNotFoundException("User Not Found With Username: " + username);

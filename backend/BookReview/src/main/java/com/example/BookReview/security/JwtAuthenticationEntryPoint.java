@@ -25,7 +25,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         body.put("error", "Unauthorized");
 
         Object customMessage = request.getAttribute("auth_exception");
-        body.put("message", customMessage != null ? customMessage : authException.getMessage());
+        body.put("msg", customMessage != null ? customMessage : authException.getMessage());
 
 
         ObjectMapper mapper = new ObjectMapper();
