@@ -51,5 +51,7 @@ e2e/*.map
 
 # System Files
 .DS_Store/
+.DS_Store
 
-# End of https://mrkandreev.name/snippets/gitignore-generator/#Java,Angular
+# Env
+.env
