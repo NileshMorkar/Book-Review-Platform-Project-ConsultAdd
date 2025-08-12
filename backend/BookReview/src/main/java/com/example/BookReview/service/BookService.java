@@ -139,6 +139,7 @@ public class BookService {
             updatedBook.setSummary(bookRequest.getSummary());
             updatedBook.setPublicationYear(updatedBook.getPublicationYear());
             updatedBook.setCoverImage(updatedBook.getCoverImage());
+            updatedBook.setGenre(updatedBook.getGenre());
 
             log.info("Updated Book Object => {}", updatedBook);
             updatedBook = bookRepository.save(updatedBook);
@@ -274,8 +275,8 @@ public class BookService {
             bookRepository.deleteById(bookId);
 
         } catch (Exception e) {
-            log.error("Book Delete Failed Failed - {}", e.getMessage());
-            throw new GlobalException(String.format("Book Delete Failed Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Book Delete Failed - {}", e.getMessage());
+            throw new GlobalException(String.format("Book Delete Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
 
