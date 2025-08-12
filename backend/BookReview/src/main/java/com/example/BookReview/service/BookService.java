@@ -236,11 +236,11 @@ public class BookService {
 
     public PageableResponse<BookCommentResponse> getAllComments(int bookId, int pageNumber, int pageSize, String sortBy, String sortDir) throws GlobalException {
 
-
         try {
             Sort sort = sortDir.equalsIgnoreCase("asc") ? (Sort.by(sortBy).ascending()) : (Sort.by(sortBy).descending());
             PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-            Page<BookComment> page = bookCommentRepository.findAll(pageRequest);
+
+            Page<BookComment> page = bookCommentRepository.findAllByBook_Id(bookId, pageRequest);
 
             log.info(page);
 

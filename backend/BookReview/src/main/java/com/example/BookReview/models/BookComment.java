@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "book_comments",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "user_id"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"bookId", "userId"})
 )
 @Data
 @Builder

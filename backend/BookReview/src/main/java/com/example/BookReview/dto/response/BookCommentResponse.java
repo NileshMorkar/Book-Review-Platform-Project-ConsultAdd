@@ -17,7 +17,8 @@ public class BookCommentResponse {
     private int bookId;
     private long userId;
     private String commentMsg;
-    
+    private String userName;
+
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm a")
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm a")
