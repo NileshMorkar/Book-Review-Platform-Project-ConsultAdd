@@ -135,11 +135,10 @@ public class BookService {
 
             updatedBook.setTitle(bookRequest.getTitle());
             updatedBook.setAuthor(bookRequest.getAuthor());
-            updatedBook.setCoverImage(bookRequest.getCoverImage());
             updatedBook.setSummary(bookRequest.getSummary());
-            updatedBook.setPublicationYear(updatedBook.getPublicationYear());
-            updatedBook.setCoverImage(updatedBook.getCoverImage());
-            updatedBook.setGenre(updatedBook.getGenre());
+            updatedBook.setPublicationYear(bookRequest.getPublicationYear());
+            updatedBook.setCoverImage(bookRequest.getCoverImage());
+            updatedBook.setGenre(bookRequest.getGenre());
 
             log.info("Updated Book Object => {}", updatedBook);
             updatedBook = bookRepository.save(updatedBook);
