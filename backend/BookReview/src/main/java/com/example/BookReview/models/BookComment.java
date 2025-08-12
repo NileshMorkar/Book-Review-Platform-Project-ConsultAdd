@@ -30,14 +30,13 @@ public class BookComment {
     private String commentMsg;
 
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "bookId")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "bookId", nullable = false)
     private Book book;
 
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
-
 
     @CreatedDate
     @Column(updatable = false)

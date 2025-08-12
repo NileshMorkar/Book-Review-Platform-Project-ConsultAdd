@@ -9,9 +9,7 @@ import com.example.BookReview.exception.GlobalException;
 import com.example.BookReview.models.Book;
 import com.example.BookReview.models.BookComment;
 import com.example.BookReview.models.User;
-import com.example.BookReview.repository.BookCommentRepository;
-import com.example.BookReview.repository.BookRepository;
-import com.example.BookReview.repository.UserRepository;
+import com.example.BookReview.repository.*;
 import com.example.BookReview.util.Helper;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -35,6 +34,12 @@ public class BookService {
 
     @Autowired
     private BookCommentRepository bookCommentRepository;
+
+    @Autowired
+    private BookLikeRepository bookLikeRepository;
+
+    @Autowired
+    private BookRatingRepository bookRatingRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -188,6 +193,11 @@ public class BookService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("User Id Is Not Present.", HttpStatus.NOT_FOUND));
 
+        Optional<BookComment> bookCommentOptional = bookCommentRepository.findByUserIdAndBookId(userId, bookCommentRequest.getBookId());
+
+        if (bookCommentOptional.isPresent())
+            throw new GlobalException("Comment Is Already Present Given Book", HttpStatus.BAD_REQUEST);
+
         try {
             BookComment bookComment = BookComment.builder()
                     .book(book)
@@ -252,11 +262,16 @@ public class BookService {
 
     }
 
-    public void deleteBook(int id) throws GlobalException {
+    @Transactional
+    public void deleteBook(int bookId) throws GlobalException {
         try {
-            bookRepository.findById(id).orElseThrow(() -> new Exception("Book Not Found Exception"));
+            bookRepository.findById(bookId).orElseThrow(() -> new Exception("Book Not Found Exception"));
 
-            bookRepository.deleteById(id);
+            bookCommentRepository.deleteAllByBookId(bookId);
+            bookLikeRepository.deleteAllByBookId(bookId);
+            bookRatingRepository.deleteAllByBookId(bookId);
+
+            bookRepository.deleteById(bookId);
 
         } catch (Exception e) {
             log.error("Book Delete Failed Failed - {}", e.getMessage());
