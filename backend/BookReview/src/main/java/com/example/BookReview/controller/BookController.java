@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookRequest bookRequest) throws GlobalException {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(bookRequest));
@@ -51,6 +53,12 @@ public class BookController {
         return ResponseEntity.ok(bookService.updateBook(id, bookRequest));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteBook(@PathVariable int id) throws GlobalException {
+        bookService.deleteBook(id);
+        return ResponseEntity.ok(ApiResponse.builder().msg("Book Deleted Successfully!").httpStatus(HttpStatus.OK).build());
+    }
 
     @GetMapping("/search/{searchString}")
     public ResponseEntity<PageableResponse<BookResponse>> searchBook(
@@ -83,7 +91,7 @@ public class BookController {
 
         long userId = userDetails.getId();
         bookService.updateComment(userId, commentId, bookCommentRequest);
-        
+
         return ResponseEntity.ok(
                 ApiResponse.builder()
                         .msg("Comment Is Updated Successfully!")

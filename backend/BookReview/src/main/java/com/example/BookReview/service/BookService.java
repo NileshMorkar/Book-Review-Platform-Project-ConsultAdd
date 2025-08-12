@@ -252,4 +252,17 @@ public class BookService {
 
     }
 
+    public void deleteBook(int id) throws GlobalException {
+        try {
+            bookRepository.findById(id).orElseThrow(() -> new Exception("Book Not Found Exception"));
+
+            bookRepository.deleteById(id);
+
+        } catch (Exception e) {
+            log.error("Book Delete Failed Failed - {}", e.getMessage());
+            throw new GlobalException(String.format("Book Delete Failed Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
 }

@@ -1,17 +1,27 @@
 package com.example.BookReview.controller;
 
+import com.example.BookReview.dto.request.AdminRequest;
+import com.example.BookReview.dto.response.AdminResponse;
+import com.example.BookReview.exception.GlobalException;
+import com.example.BookReview.service.AdminService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admins")
+@RequestMapping("/api/admins")
 public class AdminController {
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("test Route For Teacher");
+    @Autowired
+    private AdminService adminService;
+
+    @PostMapping
+    public ResponseEntity<AdminResponse> createAdmin(@Valid @RequestBody AdminRequest adminRequest) throws GlobalException {
+        return ResponseEntity.ok(adminService.createAdmin(adminRequest));
     }
 
 }
