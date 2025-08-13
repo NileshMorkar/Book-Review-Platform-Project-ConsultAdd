@@ -1,0 +1,17 @@
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>📚 Admin Panel</h2>
+    <ul>
+      <li><a routerLink="book" routerLinkActive="active">Manage Books</a></li>
+      <li><a routerLink="authors" routerLinkActive="active">Manage Authors</a></li>
+      <li><a routerLink="genres" routerLinkActive="active">Manage Genres</a></li>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
