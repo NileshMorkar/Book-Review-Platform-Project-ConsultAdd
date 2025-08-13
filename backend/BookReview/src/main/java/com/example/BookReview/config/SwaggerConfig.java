@@ -17,7 +17,7 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        String schemeName = "bearerScheme";
+        String schemeName = "Bearer Token (JWT)";
         return new OpenAPI()
                 .addSecurityItem(
                         new SecurityRequirement().addList(schemeName)

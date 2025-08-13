@@ -3,13 +3,13 @@ package com.example.BookReview.controller;
 import com.example.BookReview.exception.GlobalException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
 
-    @RequestMapping("/")
+    @GetMapping("/")
     public void homePage(HttpServletResponse httpServletResponse) throws GlobalException {
         try {
             httpServletResponse.sendRedirect("/swagger-ui/index.html");

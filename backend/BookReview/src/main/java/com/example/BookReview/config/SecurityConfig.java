@@ -39,12 +39,10 @@ public class SecurityConfig {
 
             // Swagger
             "/v3/api-docs/**",
-            "/v2/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/swagger-resources/**",
             "/webjars/**"
-
     };
 
     @Autowired
