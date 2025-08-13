@@ -1,0 +1,27 @@
+<div class="search-bar">
+  <input
+    type="text"
+    placeholder="🔍 Search by title, author, or genre"
+    [(ngModel)]="searchTerm"
+    (input)="onSearch()"
+    aria-label="Search books"
+  />
+</div>
+
+<div class="cards-container">
+  <div
+    class="book-card"
+    *ngFor="let book of filteredBooks"
+    (click)="onCardClick(book)"
+  >
+    <img 
+      [src]="(book.coverImage)" 
+      alt="{{ book.title || 'Book cover' }}" 
+    />
+    <div class="book-info">
+      <h3>{{ book.title }}</h3>
+      <p class="author">{{ book.author }}</p>
+      <span class="genre">{{ book.genre }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+.admin-book-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  text-align: center; 
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+.action-buttons {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.btn {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.btn.edit {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn.edit:hover {
+  background-color: #0056b3;
+}
+
+.btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn.delete:hover {
+  background-color: #a71d2a;
+}
+
+.book-title {
+  font-size: 28px;
+  text-align: center;
+  margin-top: 50px; 
+}
+
+.book-image {
+  max-width: 300px;
+  margin: 20px auto;
+  display: block;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+}
+
+.book-details p {
+  font-size: 18px;
+  text-align: center;
+  margin: 6px 0;
+}
+
+.comments-section {
+  margin-top: 30px;
+
+}
+
+.comments-section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.comment {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  min-width: 300px;
+  max-width: 500px;
+  text-align: left; 
+  box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.comment:hover {
+  transform: translateY(-3px);
+}
+
+.comment-username {
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 4px;
+}
+
+.comment-msg {
+  margin: 0;
+  font-size: 15px;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+

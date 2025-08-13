@@ -1,0 +1,29 @@
+<div class="admin-book-container" *ngIf="!loading && book">
+  <div class="action-buttons">
+    <button class="btn edit" (click)="onEdit()">Edit</button>
+    <button class="btn delete" (click)="onDelete()">Delete</button>
+  </div>
+
+  <h1 class="book-title">{{ book.title }}</h1>
+
+  <div class="book-details">
+    <img [src]="book.coverImage" alt="{{ book.title }}" class="book-image" />
+
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Genre:</strong> {{ book.genre }}</p>
+    <p><strong>Summary:</strong> {{ book.summary }}</p>
+    <p><strong>Publication Year:</strong> {{ book.publicationYear }}</p>
+    <p><strong>Rating:</strong> {{ book.rating }} / 5 ⭐</p>
+    <p><strong>Like Count:</strong> {{ book.likeCount }}</p>
+  </div>
+
+  <div class="comments-section" *ngIf="comments.length > 0">
+    <h3>Comments</h3>
+    <div class="comment" *ngFor="let c of comments">
+      <p class="comment-username">{{ c.userName }}</p>
+      <p class="comment-msg">{{ c.commentMsg }}</p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="error" class="error-message">{{ error }}</div>
