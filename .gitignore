@@ -55,3 +55,5 @@ e2e/*.map
 
 # Env
 .env
+.angular
+.angular/
