@@ -30,7 +30,7 @@ public class BookRating {
     private Book book;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "useeId")
+    @JoinColumn(name = "userId")
     private User user;
 
     private int rating;
