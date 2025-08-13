@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @Log4j2
@@ -42,4 +45,30 @@ public class AdminService {
 
     }
 
+    public void uploadProfileImage(int adminId, MultipartFile file) throws GlobalException {
+
+        Admin admin = adminRepository.findById(adminId).orElseThrow(
+                () -> new GlobalException("User Is Already Present In Database, Please LogIn", HttpStatus.FOUND)
+        );
+
+        try {
+            byte[] imageBytes = file.getBytes();
+            admin.setProfileImage(imageBytes);
+
+            adminRepository.save(admin);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public AdminResponse getMyDetails(int adminId) throws GlobalException {
+
+        try {
+            return modelMapper.map(adminRepository.findById(adminId).orElse(null), AdminResponse.class);
+        } catch (Exception e) {
+            throw new GlobalException(String.format("Getting User Details Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

@@ -31,4 +31,7 @@ public class User {
 
     @Length(min = 6, message = "Password must be greater than 6 characters.")
     private String password;
+
+    @Lob
+    private byte[] profileImage;
 }

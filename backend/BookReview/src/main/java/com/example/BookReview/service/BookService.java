@@ -145,7 +145,7 @@ public class BookService {
 
             BookResponse bookResponse = modelMapper.map(updatedBook, BookResponse.class);
 
-            bookResponse.setRating(bookRepository.getBookRatingByBookId(updatedBook.getId()).orElse(0.0));
+            bookResponse.setRating(bookRepository.getBookRatingByBookId(updatedBook.getId()).orElse(3.0));
             bookResponse.setLikeCount(bookRepository.getBookLikesCountByBookId(updatedBook.getId()));
 
             return bookResponse;
