@@ -1,8 +1,10 @@
 package com.example.BookReview.config;
 
+import com.example.BookReview.models.Role;
 import com.example.BookReview.security.JwtAccessDeniedHandler;
 import com.example.BookReview.security.JwtAuthenticationEntryPoint;
 import com.example.BookReview.security.JwtAuthenticationFilter;
+import com.example.BookReview.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,21 +32,6 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_URLS = {
-            "/",
-            "/api/auth/login",
-            "/api/users/signup",
-            "/api/public/**",
-
-
-            // Swagger
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
-            "/webjars/**"
-    };
-
     @Autowired
     private UserDetailsService userDetailsService;
     @Autowired
@@ -60,8 +47,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable).cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(PUBLIC_URLS).permitAll()
-                        .requestMatchers("/api/admins/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(Constants.PUBLIC_URLS).permitAll()
+                        .requestMatchers(Constants.ADMIN_URLS).hasAuthority(Role.ROLE_ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(

@@ -13,8 +13,8 @@ public interface BookCommentRepository extends JpaRepository<BookComment, Intege
 
     Page<BookComment> findAllByBook_Id(int id, Pageable pageable);
 
-    void deleteAllByBookId(int bookId);
+    void deleteAllByBook_Id(int bookId);
 
-    Optional<BookComment> findByUserIdAndBookId(long userId, int bookId);
+    Optional<BookComment> findByUser_IdAndBook_Id(long userId, int bookId);
 
 }

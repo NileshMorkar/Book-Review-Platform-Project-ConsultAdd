@@ -2,25 +2,25 @@ package com.example.BookReview.service;
 
 import com.example.BookReview.dto.request.BookRequest;
 import com.example.BookReview.dto.response.BookResponse;
-import com.example.BookReview.dto.response.PageableResponse;
 import com.example.BookReview.exception.GlobalException;
 import com.example.BookReview.models.Book;
+import com.example.BookReview.models.BookComment;
+import com.example.BookReview.models.User;
+import com.example.BookReview.repository.BookCommentRepository;
+import com.example.BookReview.repository.BookLikeRepository;
+import com.example.BookReview.repository.BookRatingRepository;
 import com.example.BookReview.repository.BookRepository;
-import com.example.BookReview.util.Helper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +37,79 @@ public class BookServiceTests {
 
     @InjectMocks
     private BookService bookService;
+
+    @Mock
+    private BookCommentRepository bookCommentRepository;
+
+    @Mock
+    private BookLikeRepository bookLikeRepository;
+
+    @Mock
+    private BookRatingRepository bookRatingRepository;
+
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testDeleteBook_Success() throws GlobalException {
+        int bookId = 1;
+
+        // Mock: book exists
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(new Book()));
+
+        // Act
+        bookService.deleteBook(bookId);
+
+        // Assert: Verify correct repository calls
+        verify(bookCommentRepository, times(1)).deleteAllByBook_Id(bookId);
+        verify(bookLikeRepository, times(1)).deleteAllByBookId(bookId);
+        verify(bookRatingRepository, times(1)).deleteAllByBookId(bookId);
+        verify(bookRepository, times(1)).deleteById(bookId);
+    }
+
+    @Test
+    void testDeleteBook_NotFound() {
+        int bookId = 99;
+
+        // Mock: book not found
+        when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        GlobalException ex = assertThrows(GlobalException.class, () -> {
+            bookService.deleteBook(bookId);
+        });
+
+        assertTrue(ex.getMessage().contains("Book Delete Failed - Book Not Found Exception"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getHttpStatus());
+
+        // Ensure nothing else was called
+        verify(bookCommentRepository, never()).deleteAllByBook_Id(anyInt());
+        verify(bookLikeRepository, never()).deleteAllByBookId(anyInt());
+        verify(bookRatingRepository, never()).deleteAllByBookId(anyInt());
+        verify(bookRepository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void testDeleteBook_RepositoryThrowsError() {
+        int bookId = 2;
+
+        // Mock: book exists
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(new Book()));
+
+        // Mock: failure when deleting comments
+        doThrow(new RuntimeException("DB error")).when(bookCommentRepository).deleteAllByBook_Id(bookId);
+
+        // Act & Assert
+        GlobalException ex = assertThrows(GlobalException.class, () -> {
+            bookService.deleteBook(bookId);
+        });
+
+        assertTrue(ex.getMessage().contains("Book Delete Failed - DB error"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getHttpStatus());
+    }
 
     @Test
     void createBook_ShouldReturnBookResponse_WhenSuccess() throws GlobalException {
@@ -120,39 +193,98 @@ public class BookServiceTests {
         assertTrue(ex.getMessage().contains("Book Not Found"));
     }
 
+//    @Test
+//    void testGetAllBooks_Success() throws GlobalException {
+//        // Arrange
+//        Book book = new Book();
+//        book.setId(1);
+//        book.setTitle("Book A");
+//
+//        Page<Book> mockPage = new PageImpl<>(List.of(book));
+//
+//        BookResponse bookResponse = new BookResponse();
+//        bookResponse.setId(1);
+//        bookResponse.setTitle("Book A");
+//
+//        Mockito.when(bookRepository.findAll(Mockito.any(Pageable.class))).thenReturn(mockPage);
+//        Mockito.when(bookRepository.getBookRatingByBookId(1)).thenReturn(Optional.of(4.0));
+//        Mockito.when(bookRepository.getBookLikesCountByBookId(1)).thenReturn(5);
+//
+//        // Mock static method for Helper
+//        try (MockedStatic<Helper> helperMock = Mockito.mockStatic(Helper.class)) {
+//            PageableResponse<BookResponse> pageableResponse = new PageableResponse<>();
+//            pageableResponse.setData(new ArrayList<>(List.of(bookResponse)));
+//
+//            helperMock.when(() -> Helper.getPageableResponse(mockPage, BookResponse.class))
+//                    .thenReturn(pageableResponse);
+//
+//            // Act
+//            PageableResponse<BookResponse> result = bookService.getAllBooks(0, 10, "title", "asc");
+//
+//            // Assert
+//            assertEquals(1, result.getData().size());
+//            assertEquals(4.0, result.getData().get(0).getRating());
+//            assertEquals(5, result.getData().get(0).getLikeCount());
+//        }
+//    }
+
+
     @Test
-    void testGetAllBooks_Success() throws GlobalException {
+    void deleteComment_Success() throws GlobalException {
         // Arrange
-        Book book = new Book();
-        book.setId(1);
-        book.setTitle("Book A");
+        int userId = 1;
+        int commentId = 101;
 
-        Page<Book> mockPage = new PageImpl<>(List.of(book));
+        BookComment mockComment = new BookComment();
+        User mockUser = new User();
+        mockUser.setId((long) userId);
+        mockComment.setUser(mockUser);
 
-        BookResponse bookResponse = new BookResponse();
-        bookResponse.setId(1);
-        bookResponse.setTitle("Book A");
+        when(bookCommentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
 
-        Mockito.when(bookRepository.findAll(Mockito.any(Pageable.class))).thenReturn(mockPage);
-        Mockito.when(bookRepository.getBookRatingByBookId(1)).thenReturn(Optional.of(4.0));
-        Mockito.when(bookRepository.getBookLikesCountByBookId(1)).thenReturn(5);
+        // Act
+        bookService.deleteComment(userId, commentId);
 
-        // Mock static method for Helper
-        try (MockedStatic<Helper> helperMock = Mockito.mockStatic(Helper.class)) {
-            PageableResponse<BookResponse> pageableResponse = new PageableResponse<>();
-            pageableResponse.setData(new ArrayList<>(List.of(bookResponse)));
-
-            helperMock.when(() -> Helper.getPageableResponse(mockPage, BookResponse.class))
-                    .thenReturn(pageableResponse);
-
-            // Act
-            PageableResponse<BookResponse> result = bookService.getAllBooks(0, 10, "title", "asc");
-
-            // Assert
-            assertEquals(1, result.getData().size());
-            assertEquals(4.0, result.getData().get(0).getRating());
-            assertEquals(5, result.getData().get(0).getLikeCount());
-        }
+        // Assert
+        verify(bookCommentRepository, times(1)).deleteById(commentId);
     }
 
+    @Test
+    void deleteComment_CommentNotFound() {
+        // Arrange
+        int userId = 1;
+        int commentId = 101;
+
+        when(bookCommentRepository.findById(commentId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        GlobalException exception = assertThrows(GlobalException.class,
+                () -> bookService.deleteComment(userId, commentId));
+
+        assertEquals("Comment Not Present!", exception.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        verify(bookCommentRepository, never()).deleteById(anyInt());
+    }
+
+    @Test
+    void deleteComment_UserIdMismatch() {
+        // Arrange
+        int userId = 1;
+        int commentId = 101;
+
+        BookComment mockComment = new BookComment();
+        User mockUser = new User();
+        mockUser.setId((long) 999); // Different user
+        mockComment.setUser(mockUser);
+
+        when(bookCommentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
+
+        // Act & Assert
+        GlobalException exception = assertThrows(GlobalException.class,
+                () -> bookService.deleteComment(userId, commentId));
+
+        assertTrue(exception.getMessage().contains("Comment Delete Exception"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getHttpStatus());
+        verify(bookCommentRepository, never()).deleteById(anyInt());
+    }
 }

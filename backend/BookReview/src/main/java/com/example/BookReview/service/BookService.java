@@ -6,9 +6,7 @@ import com.example.BookReview.dto.response.BookCommentResponse;
 import com.example.BookReview.dto.response.BookResponse;
 import com.example.BookReview.dto.response.PageableResponse;
 import com.example.BookReview.exception.GlobalException;
-import com.example.BookReview.models.Book;
-import com.example.BookReview.models.BookComment;
-import com.example.BookReview.models.User;
+import com.example.BookReview.models.*;
 import com.example.BookReview.repository.*;
 import com.example.BookReview.util.Helper;
 import jakarta.validation.Valid;
@@ -23,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,6 +45,9 @@ public class BookService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BookJdbcRepository bookJdbcRepository;
 
 
     public BookResponse createBook(BookRequest bookRequest) throws GlobalException {
@@ -95,23 +97,10 @@ public class BookService {
         }
     }
 
-    public PageableResponse<BookResponse> getAllBooks(int pageNumber, int pageSize, String sortBy, String sortDir) throws GlobalException {
+    public List<BookResponse> getAllBooks(long userId, int pageNumber, int pageSize, String sortBy, String sortDir) throws GlobalException {
 
         try {
-            Sort sort = sortDir.equalsIgnoreCase("asc") ? (Sort.by(sortBy).ascending()) : (Sort.by(sortBy).descending());
-            PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-            Page<Book> page = bookRepository.findAll(pageRequest);
-
-            log.info(page);
-
-            PageableResponse<BookResponse> pageableResponse = Helper.getPageableResponse(page, BookResponse.class);
-
-            pageableResponse.getData().forEach((bookResponse) -> {
-                bookResponse.setRating(bookRepository.getBookRatingByBookId(bookResponse.getId()).orElse(3.0));
-                bookResponse.setLikeCount(bookRepository.getBookLikesCountByBookId(bookResponse.getId()));
-            });
-
-            return pageableResponse;
+            return bookJdbcRepository.getAllBooks(userId, pageNumber, pageSize);
         } catch (Exception e) {
             log.error("Get All Books Failed - {}", e.getMessage());
             throw new GlobalException(String.format("Get All Books Failed - %s", e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -193,7 +182,7 @@ public class BookService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("User Id Is Not Present.", HttpStatus.NOT_FOUND));
 
-        Optional<BookComment> bookCommentOptional = bookCommentRepository.findByUserIdAndBookId(userId, bookCommentRequest.getBookId());
+        Optional<BookComment> bookCommentOptional = bookCommentRepository.findByUser_IdAndBook_Id(userId, bookCommentRequest.getBookId());
 
         if (bookCommentOptional.isPresent())
             throw new GlobalException("Comment Is Already Present Given Book", HttpStatus.BAD_REQUEST);
@@ -214,9 +203,10 @@ public class BookService {
     }
 
     public void deleteComment(int userId, int commentId) throws GlobalException {
+        BookComment bookComment = bookCommentRepository.findById(commentId).orElseThrow(() -> new GlobalException("Comment Not Present!", HttpStatus.NOT_FOUND));
         try {
-            BookComment bookComment = bookCommentRepository.findById(commentId).orElseThrow(() -> new GlobalException("Comment Not Present!", HttpStatus.NOT_FOUND));
 
+            // 
             if (bookComment.getUser().getId() != userId)
                 throw new Exception("commentId Is Not valid");
 
@@ -267,7 +257,7 @@ public class BookService {
         try {
             bookRepository.findById(bookId).orElseThrow(() -> new Exception("Book Not Found Exception"));
 
-            bookCommentRepository.deleteAllByBookId(bookId);
+            bookCommentRepository.deleteAllByBook_Id(bookId);
             bookLikeRepository.deleteAllByBookId(bookId);
             bookRatingRepository.deleteAllByBookId(bookId);
 
@@ -277,7 +267,57 @@ public class BookService {
             log.error("Book Delete Failed - {}", e.getMessage());
             throw new GlobalException(String.format("Book Delete Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    public void likeTheBook(long userId, int bookId) throws GlobalException {
 
+        User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("User Id Is Not Present.", HttpStatus.NOT_FOUND));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new GlobalException("Book Id Is Not Present.", HttpStatus.NOT_FOUND));
+        BookLike bookLike = bookLikeRepository.findByUser_IdAndBook_Id(userId, bookId).orElse(null);
+        
+        try {
+
+            if (bookLike != null) {
+                bookLikeRepository.deleteById(bookLike.getId());
+            } else {
+                bookLike = BookLike.builder()
+                        .user(user)
+                        .book(book)
+                        .build();
+
+                bookLikeRepository.save(bookLike);
+            }
+
+        } catch (Exception e) {
+            log.error("Book Like Event Failed - {}", e.getMessage());
+            throw new GlobalException(String.format("Book Like Event Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void addRatingForTheBook(long userId, int bookId, Integer rating) throws GlobalException {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new GlobalException("User Id Is Not Present.", HttpStatus.NOT_FOUND));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new GlobalException("Book Id Is Not Present.", HttpStatus.NOT_FOUND));
+        BookRating bookRating = bookRatingRepository.findByUser_IdAndBook_Id(userId, bookId).orElse(null);
+
+        try {
+
+            if (bookRating != null) {
+                bookRating.setRating(rating);
+                bookRatingRepository.save(bookRating);
+            } else {
+                bookRating = BookRating.builder()
+                        .user(user)
+                        .book(book)
+                        .rating(rating)
+                        .build();
+
+                bookRatingRepository.save(bookRating);
+            }
+
+        } catch (Exception e) {
+            log.error("Book Rating Event Failed - {}", e.getMessage());
+            throw new GlobalException(String.format("Book Rating Event Failed - %s", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

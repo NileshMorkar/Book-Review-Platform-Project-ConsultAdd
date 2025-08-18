@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
         name = "book_ratings",
         uniqueConstraints = @UniqueConstraint(columnNames = {"bookId", "userId"})
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class BookRating {
 
     @Id

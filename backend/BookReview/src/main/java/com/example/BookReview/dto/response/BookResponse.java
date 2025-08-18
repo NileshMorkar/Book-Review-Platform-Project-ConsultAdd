@@ -37,5 +37,38 @@ public class BookResponse {
 
     private double rating;
 
-    private int likeCount;
+    private long likeCount;
+
+    private boolean isLiked;
+
+    public BookResponse(
+            int id,
+            String title,
+            String summary,
+            String author,
+            String genre,
+            String isbn,
+            int publicationYear,
+            String coverImage,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
+            Long likeCount,
+            Boolean isLiked,
+            Double rating
+    ) {
+        this.id = id;
+        this.title = title;
+        this.summary = summary;
+        this.author = author;
+        this.genre = genre;
+        this.isbn = isbn;
+        this.publicationYear = publicationYear;
+        this.coverImage = coverImage;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.rating = rating;
+        this.likeCount = likeCount != null ? likeCount.intValue() : 0;
+        this.isLiked = isLiked;
+    }
+
 }

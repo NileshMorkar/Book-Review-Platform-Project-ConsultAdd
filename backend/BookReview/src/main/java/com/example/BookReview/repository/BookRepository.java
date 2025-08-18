@@ -34,4 +34,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             nativeQuery = true
     )
     Page<Book> searchBook(@Param("searchString") String searchString, Pageable pageable);
+
+    
 }
